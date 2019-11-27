@@ -10,7 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -22,47 +21,47 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-		entityManagerFactoryRef = "mysqlEntityManagerFactory", 
-		basePackages = {"com.projetodb.MultDatasources.repository.mysql" }, 
-		transactionManagerRef = "mysqlTransactionManager")
-public class MySQLConfig {
+		entityManagerFactoryRef = "postgresqlEntityManagerFactory", 
+		basePackages = {"com.projetodb.MultDatasources.repository.postgresql" }, 
+		transactionManagerRef = "postgresqlTransactionManager")
+public class PostgresqlConfig {
 
 	@Autowired
 	private Environment env;
-
 	
-	@Primary
-	@Bean("mysqlDataSourceProperties")
-	@ConfigurationProperties("mysql.datasource")
+	
+	
+	@Bean("postgresqlDataSourceProperties")
+	@ConfigurationProperties("postgresql.datasource")
 	public DataSourceProperties dataSourceProperties() {
-		DataSourceProperties dsp = new  DataSourceProperties();
-		dsp.setUsername(env.getProperty("mysql.datasource.username"));
-		dsp.setPassword(env.getProperty("mysql.datasource.password"));
-		dsp.setDriverClassName(env.getProperty("mysql.datasource.driver-class-name"));
+		DataSourceProperties dsp = new  DataSourceProperties(); 
+		dsp.setUsername(env.getProperty("postgresql.datasource.username"));
+		dsp.setPassword(env.getProperty("postgresql.datasource.password"));
+		dsp.setDriverClassName(env.getProperty("postgresql.datasource.driver-class-name"));
 		return dsp;
 	}
 
-	@Primary
-	@Bean(name = "mysqlDataSource")
+	
+	@Bean(name = "postgresqlDataSource")
 	public DataSource dataSource() {
 		return dataSourceProperties().initializeDataSourceBuilder().build();
 	}
 
-	@Primary
-	@Bean(name = "mysqlEntityManagerFactory")
+	
+	@Bean(name = "postgresqlEntityManagerFactory")
 	public LocalContainerEntityManagerFactoryBean EntityManagerFactory(EntityManagerFactoryBuilder builder,
-			@Qualifier("mysqlDataSource") DataSource dataSource) {
+			@Qualifier("postgresqlDataSource") DataSource dataSource) {
 		return builder
 				.dataSource(dataSource)
-				.packages("com.projetodb.MultDatasources.entity.mysql")
-				.persistenceUnit("mysql")
+				.packages("com.projetodb.MultDatasources.entity.postgresql")
+				.persistenceUnit("postgresql")
 				.build();
 	}
 
-	@Primary
-	@Bean(name = "mysqlTransactionManager")
+	
+	@Bean(name = "postgresqlTransactionManager")
 	public PlatformTransactionManager  TransactionManager(
-			@Qualifier("mysqlEntityManagerFactory") EntityManagerFactory  entityManagerFactory) {
+			@Qualifier("postgresqlEntityManagerFactory") EntityManagerFactory  entityManagerFactory) {
 		return new JpaTransactionManager( entityManagerFactory);
 	}
 

@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "cliente")
-public class Cliente {
+public class MySQLCliente {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
